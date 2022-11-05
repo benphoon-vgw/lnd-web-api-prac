@@ -15,7 +15,6 @@ export interface Wallet {
 
 export interface WalletActions {
     find: (walletId : string) => Promise<TransactionResult>,
-    create: (transactionDetails : TransactionDetails) => Promise<TransactionResult>,
     credit: (transactionDetails : TransactionDetails) => Promise<TransactionResult>,
     debit: (transactionDetails : TransactionDetails) => Promise<TransactionResult | undefined>
 }
@@ -41,21 +40,6 @@ export const walletActions = (databaseActions : DatabaseActions) : WalletActions
                 };
             };
         },
-        create: async (transactionDetails) => {
-            const newWallet = {
-                walletId: transactionDetails.walletId,
-                coins: transactionDetails.coins,
-                version: 1,
-                lastTransactionId: transactionDetails.transactionId,
-                lastTransactionType: "credit",
-                lastTransactionAmount: transactionDetails.coins
-            };
-            await databaseActions.save(newWallet);
-            return {
-                outcome: "New wallet created",
-                wallet: newWallet
-            };
-        },
         credit: async (transactionDetails) => {
             const retrievedWallet = await databaseActions.load(transactionDetails.walletId);
             if (retrievedWallet && retrievedWallet.lastTransactionId === transactionDetails.transactionId) {
@@ -78,11 +62,20 @@ export const walletActions = (databaseActions : DatabaseActions) : WalletActions
                     wallet: updatedWallet
                 };
             } else {
-                return {
-                    outcome: "Error. Invalid Wallet Id",
-                    wallet: null
+                const newWallet = {
+                    walletId: transactionDetails.walletId,
+                    coins: transactionDetails.coins,
+                    version: 1,
+                    lastTransactionId: transactionDetails.transactionId,
+                    lastTransactionType: "credit",
+                    lastTransactionAmount: transactionDetails.coins
                 };
-            }
+                await databaseActions.save(newWallet);
+                return {
+                    outcome: "New wallet created",
+                    wallet: newWallet
+                };
+            };
         },
         debit: async (transactionDetails) => {
             const retrievedWallet = await databaseActions.load(transactionDetails.walletId);

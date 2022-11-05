@@ -22,8 +22,8 @@ export const memoryDbActions = (db: Wallet[]) : DatabaseActions => {
             }
         },
         load: async (walletId) => {
-            const walletIndex = await db.findIndex((wallet) => {wallet.walletId === walletId});
-            return db[walletIndex];
+            const wallet = await db.find(wallet => wallet.walletId === walletId);
+            return wallet;
         }
     }
 }

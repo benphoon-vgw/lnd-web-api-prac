@@ -31,27 +31,10 @@ export const walletRoutes = (walletActions : WalletActions) => {
     
     // POST - Credit wallet
     router.post("/:walletId/credit", async (req, res) => {
-        const transactionDetails : TransactionDetails = {
-            walletId: req.params.walletId,
-            transactionId: req.body.transactionId,
-            coins: req.body.coins
+        const result = await walletActions.credit({walletId: req.params.walletId, coins: req.body.coins, transactionId: req.body.transactionId});        
+        switch (result.outcome) {
+            case "Duplicate Transaction":
         }
-        // Find wallet
-        const retrievedWallet = walletActions.find(req.params.walletId);
-        // Create wallet if it does not exist
-        if ((await retrievedWallet).wallet) {
-            walletActions.credit(transactionDetails);
-
-        } else {
-            walletActions.create(transactionDetails)
-        }
-        // Credit wallet if not duplicate
-        
-        
-        
-        
-        const result = await walletActions.create(transactionDetails);
-        res.status(201).send(result.wallet);
     });
 
     return router

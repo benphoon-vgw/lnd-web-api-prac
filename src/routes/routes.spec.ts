@@ -1,10 +1,14 @@
 // Imports
 import express from "express";
 import request from 'supertest';
-import { walletRouter } from "./routes";
+import { Wallet, walletActions } from "../walletcontroller/walletcontroller";
+import { memoryDbActions } from "../walletservice/walletservice";
+import { walletRoutes } from "./routes";
+
+const testMemoryDb : Wallet[] = [];
 
 // Establish Test Server
-const testServer = express().use(express.json()).use('/wallets', walletRouter).listen(3000);
+const testServer = express().use(express.json()).use('/wallets', walletRoutes(walletActions(memoryDbActions(testMemoryDb)))).listen(3000);
 
 // Unit Tests for Routes
 describe("GET /wallets/:walletId", () => {
